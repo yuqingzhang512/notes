@@ -4,6 +4,11 @@
         - [manifest file](#manifest-file)
         - [cache status](#cache-status)
         - [update cache](#update-cache)
+- [event](#event)
+    - [capturing & bubbling](#capturing--bubbling)
+    - [turn off](#turn-off)
+    - [current target](#current-target)
+    - [problems of the Microsoft model](#problems-of-the-microsoft-model)
 
 
 # elements
@@ -16,7 +21,7 @@
 * Define the application cache, an absolute or relative URL
     * absolute URL must be under the <b>same origin</b>
 * should be inclueded on <b>every</b> page that you want cached(unless it's explicitly listed in the manifest file)
-* see urls controlled by application cache: __chrome://appcache-internals/__
+* see urls controlled by application cache: <u>chrome://appcache-internals/</u>
 ### manifest file
 
 ```
@@ -56,7 +61,7 @@ images/large/ images/offline.jpg
 * Some browsers place restrictions on the amount of storage quota available to app
 * If the manifest itself returns a 404 or 410, the cache is deleted
 * If the manifest or s resource specified in it fails to download, the entire cache update process  fails. The browser will keep using the old cache
-* App application’s cache is only updated when its manifest file changes. __you must modify file itself to inform the browser to refresh cached files__
+* App application’s cache is only updated when its manifest file changes. <u>you must modify file itself to inform the browser to refresh cached files</u>
 * The manifest is checked <b>twice</b> during the update, one at the start and one after all cached files have been updated
 * the HTML file that references your manifest file is automatically cached (though encouraged to include it in the manifest)
 
@@ -120,3 +125,35 @@ window.appEventListener('load', function(e) {
     }, false);
 }, false);
 ```
+
+
+# event
+
+## capturing & bubbling
+* Netscape - capturing (down)
+* Microsoft - bubbling (up)
+* any event taking place in the w3c event model is first captured until it reaches the target element and then bubbles up again
+```
+element.addEventListener(event, function, useCapture);
+```
+
+## turn off
+* Microsoft
+```
+window.event.cancelBubble = true;
+```
+* w3c model
+```
+e.stopPropagation();
+```
+
+## current target
+during the capturing and bubbling phases, the target does not change, it always remains a reference to the source
+
+## problems of the Microsoft model
+<i>this</i> keyword doesn't refer to the HTML element, this means if you do
+```
+element1.attachEvent('onclick', doSomething);
+element2.attachEvent('onclick', doSomething);
+```
+you <b>cannot</b> know which HTML element currently handles the event
